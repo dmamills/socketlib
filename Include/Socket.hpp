@@ -19,25 +19,28 @@ class Socket {
 
 public:
 	Socket();
-	Socket(std::string,unsigned short,bool);
+	Socket(std::string,unsigned short,bool,int);
 	~Socket();
 	void close();
 
-	
+
+protected:
+	sockaddr_in _addr;
+	SOCKET _hSocket;
+
+	bool bind();
+	bool listen();
+	bool connect();
 
 private:
 	std::string _ipAddr;
 	unsigned short _portAddr;
-	SOCKET _hSocket;
 	WSADATA _wsa;
-	sockaddr_in _addr;
+	
 
 	bool initWSA();
-	bool initSocket();
-	bool bind();
-	bool listen();
-	bool connect();
-	
+	bool initSocket(int);
+
 };
 
 

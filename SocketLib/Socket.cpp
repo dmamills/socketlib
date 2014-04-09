@@ -4,23 +4,17 @@
 //WHY
 Socket::Socket() {}
 
-Socket::Socket(std::string ip,unsigned short port,bool server = false) {
+Socket::Socket(std::string ip,unsigned short port,bool server = false,int type) {
 	_ipAddr = ip;
 	_portAddr = port;
 
 	initWSA();
-	initSocket();
+	initSocket(type);
 
 	_addr.sin_family = AF_INET;
-	_addr.sin_addr.s_addr = inet_addr(_ipAddr.c_str());
-	_addr.sin_port = htons(_portAddr);
+	_addr.sin_addr.s_addr = inet_addr(ip.c_str());
+	_addr.sin_port = htons(port);
 
-	if(server) {
-		bind();
-		listen();
-	} else {
-		connect();
-	}
 }
 
 //cleanup after yo self
@@ -41,9 +35,9 @@ bool Socket::initWSA() {
 	return false;
 }
 
-bool Socket::initSocket() {
+bool Socket::initSocket(int type) {
 
-	_hSocket = socket(AF_INET,SOCK_STREAM, 0);
+	_hSocket = socket(AF_INET,type, 0);
 
 	//success!
 	if (_hSocket != INVALID_SOCKET) {
@@ -51,6 +45,7 @@ bool Socket::initSocket() {
 	}
 
 	//failure?
+	std::cerr<<"Error occured in Socket::initSocket\n";
 	close();
 	return false;
 }
