@@ -1,5 +1,5 @@
-#if !defined (GUARD_SOCKET_LIB)
-#define GUARD_SOCKET_LIB
+#if !defined (GUARD_SOCKET)
+#define GUARD_SOCKET
 
 #if defined(_DEBUG) && !defined(_DLL)
 #pragma comment (lib, "SocketLib-mt-s-gd.lib")
@@ -12,7 +12,9 @@
 #endif
 
 #include <iostream>
-#include <winsock.h>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#pragma comment (lib,"ws2_32.lib")
 #include <string>
 
 class Socket {

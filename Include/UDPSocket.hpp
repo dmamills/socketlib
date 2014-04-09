@@ -11,6 +11,6 @@ public:
 protected:
 
 private:
-	const int MAX_SIZE = 256;
+	
 
 };

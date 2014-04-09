@@ -4,7 +4,7 @@
 //WHY
 Socket::Socket() {}
 
-Socket::Socket(std::string ip,unsigned short port,bool server = false,int type) {
+Socket::Socket(std::string ip,unsigned short port,bool server = false,int type = SOCK_STREAM) {
 	_ipAddr = ip;
 	_portAddr = port;
 
@@ -12,9 +12,10 @@ Socket::Socket(std::string ip,unsigned short port,bool server = false,int type) 
 	initSocket(type);
 
 	_addr.sin_family = AF_INET;
-	_addr.sin_addr.s_addr = inet_addr(ip.c_str());
 	_addr.sin_port = htons(port);
 
+	//UDP, might not be correct for socket
+	_addr.sin_addr.s_addr = (server) ? htonl(INADDR_ANY) : inet_addr(ip.c_str());
 }
 
 //cleanup after yo self
