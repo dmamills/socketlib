@@ -12,6 +12,6 @@ int main() {
 		std::string data = socket.recieveData();
 		std::cout <<"RECIEVED: " << data << "\n";
 	}
-
+	
 	return 0;
 }

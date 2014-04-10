@@ -15,5 +15,5 @@ TCPSocket::TCPSocket(std::string ip, unsigned short port, bool server) : Socket(
 
 
 TCPSocket::~TCPSocket() {
-
+	
 }

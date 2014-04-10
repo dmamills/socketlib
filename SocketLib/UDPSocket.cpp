@@ -29,7 +29,7 @@ int UDPSocket::sendData(std::string data) {
 }
 
 std::string UDPSocket::recieveData() {
-	sockaddr clientAddress;
+	    sockaddr clientAddress;
 		socklen_t cbClientAddress = sizeof(clientAddress);
 		int const MAX_LINE = 256;
 		char msg[MAX_LINE];
