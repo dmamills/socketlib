@@ -17,33 +17,37 @@
 #pragma comment (lib,"ws2_32.lib")
 #include <string>
 
+namespace SocketLib {
+
+#define BACKLOG_NUM 10
+#define MAX_SIZE 256
+
 class Socket {
 
 public:
 	Socket();
-	Socket(std::string,unsigned short,bool,int);
-	~Socket();
+	virtual ~Socket();
 	void close();
 
-
-protected:
-	sockaddr_in _addr;
-	SOCKET _hSocket;
-
-	bool bind();
+	bool bind(int);
 	bool listen();
-	bool connect();
+	bool accept(Socket&);
+	bool connect(std::string,int);
+
+	int send(std::string);
+	int recv(std::string&);
 
 private:
+
+	sockaddr_in _addr;
+	SOCKET _hSocket;
 	std::string _ipAddr;
 	unsigned short _portAddr;
 	WSADATA _wsa;
-	
 
 	bool initWSA();
 	bool initSocket(int);
-
 };
 
-
+}
 #endif

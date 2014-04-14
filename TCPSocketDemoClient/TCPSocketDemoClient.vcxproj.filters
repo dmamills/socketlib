@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="udp_client_main.cpp">
+    <ClCompile Include="tcp_client_demo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

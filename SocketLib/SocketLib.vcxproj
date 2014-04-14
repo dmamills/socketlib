@@ -216,14 +216,14 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Include\ClientSocket.hpp" />
+    <ClInclude Include="..\Include\ServerSocket.hpp" />
     <ClInclude Include="..\Include\Socket.hpp" />
-    <ClInclude Include="..\Include\TCPSocket.hpp" />
-    <ClInclude Include="..\Include\UDPSocket.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ClientSocket.cpp" />
+    <ClCompile Include="ServerSocket.cpp" />
     <ClCompile Include="Socket.cpp" />
-    <ClCompile Include="TCPSocket.cpp" />
-    <ClCompile Include="UDPSocket.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,27 +1,49 @@
 #include <Socket.hpp>
+using namespace SocketLib;
 
-
-//WHY
-Socket::Socket() {}
-
-Socket::Socket(std::string ip,unsigned short port,bool server = false,int type = SOCK_STREAM) {
-	_ipAddr = ip;
-	_portAddr = port;
-
+Socket::Socket() {
 	initWSA();
-	initSocket(type);
-
-	_addr.sin_family = AF_INET;
-	_addr.sin_port = htons(port);
-
-	//UDP, might not be correct for socket
-	_addr.sin_addr.s_addr = (server) ? htonl(INADDR_ANY) : inet_addr(ip.c_str());
+	initSocket(SOCK_STREAM);
 }
 
 //cleanup after yo self
 Socket::~Socket() {
 	close();
 }
+
+bool Socket::bind(int port) {
+
+  _portAddr = port;
+  _addr.sin_family = AF_INET;
+  _addr.sin_addr.s_addr = INADDR_ANY;
+  _addr.sin_port = htons(_portAddr);
+
+  return !(::bind ( _hSocket,( struct sockaddr * ) &_addr, sizeof (_addr ) ) == SOCKET_ERROR);
+}
+
+
+bool Socket::listen() {
+	return !(::listen(_hSocket,BACKLOG_NUM) == SOCKET_ERROR);
+}
+
+bool Socket::accept(Socket& conn) {
+  int addr_length = sizeof(_addr);
+  conn._hSocket = ::accept( _hSocket, ( SOCKADDR* ) &_addr, ( socklen_t * ) &addr_length );
+  return (conn._hSocket > 0);
+}
+
+bool Socket::connect(std::string ip, int port) {
+
+	_ipAddr = ip;
+	_portAddr = port;
+
+	_addr.sin_family = AF_INET;
+	_addr.sin_port = htons(_portAddr);
+	_addr.sin_addr.s_addr = inet_addr(ip.c_str());
+
+	return !(::connect ( _hSocket, (SOCKADDR*) &_addr, sizeof ( _addr )) == SOCKET_ERROR);
+}
+
 
 
 bool Socket::initWSA() {
@@ -38,7 +60,8 @@ bool Socket::initWSA() {
 
 bool Socket::initSocket(int type) {
 
-	_hSocket = socket(AF_INET,type, 0);
+	int protocol = (type == SOCK_STREAM) ? IPPROTO_TCP : 0;
+	_hSocket = socket(AF_INET,type,protocol);
 
 	//success!
 	if (_hSocket != INVALID_SOCKET) {
@@ -51,31 +74,19 @@ bool Socket::initSocket(int type) {
 	return false;
 }
 
-bool Socket::connect() {
-	if(::connect(_hSocket,(SOCKADDR*)&_addr,sizeof(_addr)) == SOCKET_ERROR) {
-		std::cerr<<"ERROR occured in Socket::connect\n";
-		close();
-		return false;
-	}
-	return true;
+int Socket::send(std::string data) { 
+
+	return ::send(_hSocket,data.c_str(),data.length(),0);
 }
 
-bool Socket::bind() {
-	if(::bind(_hSocket,(SOCKADDR*)&_addr,sizeof(_addr)) == SOCKET_ERROR) {
-		std::cerr<<"ERROR OCCURED in Socket::bind\n";
-		close();
-		return false;
-	}
-	return true;
-}
+int Socket::recv(std::string& data) {
 
-bool Socket::listen() {
-	if(::listen(_hSocket,1) == SOCKET_ERROR) {
-		std::cerr<<"ERROR OCCURED in Socket::listen\n";
-		close();
-		return false;
-	}
-	return true;
+	char buf[MAX_SIZE];
+
+	int r = ::recv(_hSocket,buf,MAX_SIZE,0);
+
+	data = buf;
+	return r;
 }
 
 void Socket::close() {
