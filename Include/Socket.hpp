@@ -37,6 +37,9 @@ public:
 	int send(std::string);
 	int recv(std::string&);
 
+	Socket& operator << (std::string);
+	Socket& operator >> (std::string&);
+
 private:
 
 	sockaddr_in _addr;

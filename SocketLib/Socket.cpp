@@ -44,8 +44,6 @@ bool Socket::connect(std::string ip, int port) {
 	return !(::connect ( _hSocket, (SOCKADDR*) &_addr, sizeof ( _addr )) == SOCKET_ERROR);
 }
 
-
-
 bool Socket::initWSA() {
 	auto r = WSAStartup(MAKEWORD(2,2), &_wsa);
 	//wsa success
@@ -91,4 +89,14 @@ int Socket::recv(std::string& data) {
 void Socket::close() {
 	closesocket(_hSocket);
 	WSACleanup();
+}
+
+Socket& Socket::operator << (std::string data) {
+	Socket::send(data);
+	return *this;
+}
+
+Socket& Socket::operator >> (std::string& data) {
+	Socket::recv(data);
+	return *this;
 }

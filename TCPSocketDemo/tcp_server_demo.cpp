@@ -1,22 +1,26 @@
 #include <ServerSocket.hpp>
 #include <string>
 #include <iostream>
+#include <vector>
 
 
 int main() {
 	
 	SocketLib::ServerSocket server(27015);
-	
-	while(true) {
-		SocketLib::ServerSocket connection;
-		server.accept(connection);
+	std::vector<SocketLib::ServerSocket> connections;
 
-		while(true) {
+	while(1) {
+		SocketLib::ServerSocket connection;
+		connections.push_back(server.accept(connection));
+
+		while(1) {
 			std::string data;
-			connection.recv(data);
+			connection >> data; //connection.recv(data);
 
 			std::cout<<"recv: " << data << "\n";
-			connection.send(data);
+			connection << data; //connection.send(data);
+
+			if(data == "LEAVE ME ALONE") break;
 			
 			data.clear();
 		}
