@@ -2,28 +2,38 @@
 #include <string>
 #include <iostream>
 #include <vector>
-
+#include <fstream>
 
 int main() {
 	
 	SocketLib::ServerSocket server(27015);
-	std::vector<SocketLib::ServerSocket> connections;
 
 	while(1) {
 		SocketLib::ServerSocket connection;
-		connections.push_back(server.accept(connection));
+		server.accept(connection);
 
+		std::string data;
 		while(1) {
-			std::string data;
-			connection >> data; //connection.recv(data);
+			std::ifstream fstream("in.jpg",std::ios::binary);
 
-			std::cout<<"recv: " << data << "\n";
-			connection << data; //connection.send(data);
+			if(fstream.is_open()) {
+				
+				connection.recv(data);
+				 if(data == "READY") {
 
-			if(data == "LEAVE ME ALONE") break;
-			
-			data.clear();
+					 std::streambuf* buffer = fstream.rdbuf();
+					 std::ostringstream oss;
+					 oss << buffer;
+
+					 connection.send(oss.str());
+				 }
+				 fstream.close();
+			} else {
+				std::cout<<"UNABLE TO OPEN FILE!\n";
+			}
+			 break;
 		}
+		break;
 	}
 	
 	return 0;

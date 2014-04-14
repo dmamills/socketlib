@@ -16,6 +16,7 @@
 #include <WS2tcpip.h>
 #pragma comment (lib,"ws2_32.lib")
 #include <string>
+#include <sstream>
 
 namespace SocketLib {
 
@@ -36,6 +37,9 @@ public:
 
 	int send(std::string);
 	int recv(std::string&);
+
+	int send(std::streambuf*);
+	//int recv(std::streambuf&);
 
 	Socket& operator << (std::string);
 	Socket& operator >> (std::string&);
