@@ -10,10 +10,10 @@ int main() {
 	std::string in;
 
 	while(getline(std::cin,in)) {
-		std::cout<<"sending: " << in << "\n";
+		std::cout<<"Sending: " << in << "\n";
 		client.send(in);
 		client.recv(data);
-		std::cout << "got: " << data << "\n";
+		std::cout << "Recieved: " << data << "\n";
 
 		data.clear();
 		in.clear();

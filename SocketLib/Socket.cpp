@@ -76,15 +76,14 @@ bool Socket::initSocket(int type) {
 
 int Socket::send(std::string data) { 
 
-	return ::send(_hSocket,data.c_str(),data.length(),0);
+	return ::send(_hSocket,data.c_str(),strlen(data.c_str()),0);
 }
 
 int Socket::recv(std::string& data) {
 
-	char buf[MAX_SIZE];
-
+	char buf[MAX_SIZE+1];
 	int r = ::recv(_hSocket,buf,MAX_SIZE,0);
-
+	buf[min(r,255)] = 0;
 	data = buf;
 	return r;
 }
