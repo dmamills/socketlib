@@ -17,11 +17,12 @@
 #pragma comment (lib,"ws2_32.lib")
 #include <string>
 #include <sstream>
+#include <vector>
 
 namespace SocketLib {
 
 #define BACKLOG_NUM 10
-#define MAX_SIZE 256
+#define MAX_SIZE 1024
 
 class Socket {
 
@@ -35,10 +36,12 @@ public:
 	bool accept(Socket&);
 	bool connect(std::string,int);
 
-
-
 	int send(std::string);
 	int recv(std::string&);
+	int recv(std::string&,int);
+
+	int send(std::vector<char>);
+	int recv(std::vector<char>&);
 
 	Socket& operator << (std::string);
 	Socket& operator >> (std::string&);

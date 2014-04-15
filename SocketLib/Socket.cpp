@@ -73,10 +73,9 @@ bool Socket::initSocket(int type) {
 }
 
 int Socket::send(std::string data) { 
-	std::cout <<"sending: " << data <<"\n";
+	//std::cout <<"sending: " << data <<"\n";
 
-
-	int r = ::send(_hSocket,data.c_str(),strlen(data.c_str()),0);
+	int r = ::send(_hSocket,data.c_str(),data.size(),0);
 	if(r == SOCKET_ERROR) {
 	  std::cout<<"WSA Error in send: " << WSAGetLastError() << "\n";
 	}
@@ -86,16 +85,57 @@ int Socket::send(std::string data) {
 
 int Socket::recv(std::string& data) {
 
-	char buf[MAX_SIZE+1];
+	char buf[MAX_SIZE];
 	int r = ::recv(_hSocket,buf,MAX_SIZE,0);
 
 	if(r == SOCKET_ERROR) {
 		std::cout<<"WSA Error in recv: " << WSAGetLastError() << "\n";
 	} else {
-		buf[min(r,255)] = 0;
+		//buf[min(r,255)] = 0;
+		buf[r] = '\0';
 		data = buf;
 	}
-	std::cout <<"Recieved: " << data << "\n";
+	//std::cout <<"Recieved: " << data << "\n";
+
+	return r;
+}
+
+
+int Socket::send(std::vector<char> data) { 
+	//std::cout <<"sending: " << data <<"\n";
+
+	int r = ::send(_hSocket,&data[0],data.size(),0);
+	if(r == SOCKET_ERROR) {
+	  std::cout<<"WSA Error in send: " << WSAGetLastError() << "\n";
+	}
+
+	return r; 
+}
+
+int Socket::recv(std::vector<char>& data) {
+
+	int r = ::recv(_hSocket,&data[0],data.size(),0);
+
+	if(r == SOCKET_ERROR) {
+		std::cout<<"WSA Error in recv: " << WSAGetLastError() << "\n";
+	} 
+	return r;
+}
+
+
+int Socket::recv(std::string& data,int size) {
+
+	char buf[MAX_SIZE];
+	int r = ::recv(_hSocket,buf,size,0);
+
+	if(r == SOCKET_ERROR) {
+		std::cout<<"WSA Error in recv: " << WSAGetLastError() << "\n";
+	} else {
+		//buf[min(r,255)] = 0;
+		buf[r] = '\0';
+		data = buf;
+	}
+	//std::cout <<"Recieved: " << data << "\n";
 
 	return r;
 }
@@ -105,8 +145,6 @@ void Socket::close() {
 	closesocket(_hSocket);
 	WSACleanup();
 }
-
-
 
 /* Operator overloads for that real stream feel! */
 Socket& Socket::operator << (std::string data) {
