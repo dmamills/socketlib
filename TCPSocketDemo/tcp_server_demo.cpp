@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <thread>
 #include <fstream>
 
 
@@ -36,6 +37,7 @@ int sendChunk(SocketLib::ServerSocket& connection,std::vector<char> chunk) {
 
 void sendFile(SocketLib::ServerSocket& connection) {
 	
+	std::cout <<"Started connection thread #" << std::this_thread::get_id() << "\n";
 		std::string data;
 		while(true) {
 				
@@ -79,18 +81,27 @@ void sendFile(SocketLib::ServerSocket& connection) {
 						 //buffer vector
 						 std::vector<char> buffer;
 						 int cs = 0;
+						 int total = 0;
 						 for(const char&c : contents) {
 							 cs++;
 							 buffer.push_back(c);
 
 							 //if chunk reached max size, send it!
 							 if(cs == MAX_SIZE) {
+								 
 								 int bytesSent = sendChunk(connection,buffer);
+								 total += bytesSent;
 								 buffer.clear();
 								 cs = 0;
 							 }
 						 }
+						//send last chunk!
+						int bytesSent = sendChunk(connection,buffer);
+						total += bytesSent;
+						std::cout <<"Sent " << total << " bytes\n";
 					}
+
+					 std::cout<<"Closing file stream\n";
 					 fstream.close();
 
 				 } else {
@@ -110,8 +121,8 @@ int main() {
 	while(1) {
 		SocketLib::ServerSocket connection;
 		server.accept(connection);
-		sendFile(connection);
-		break;
+     	sendFile(connection);
+		//break;
 	}
 	return 0;
 }
