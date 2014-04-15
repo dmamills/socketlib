@@ -19,17 +19,17 @@ void requestFile(SocketLib::ClientSocket& client,std::string request_filename,st
 
 	if(fstream.is_open()) {
 		std::cout <<"File opened\n";
-		
-		//Start file request, and wait for reply
-		client.send("OK");
 		std::string data;
-		client.recv(data);
+		//Start file request, and wait for reply
+		client << "OK";
+		client >> data;
+		
 		if(data == "OK") {
 
 			//send filename
 			std::cout << "Got OK, sending filename\n";
-			client.send(request_filename);
-			client.recv(data);
+			client << request_filename;
+			client >> data;
 			
 			if(data != "NOTFOUND") {
 				//get total file size
@@ -39,15 +39,15 @@ void requestFile(SocketLib::ClientSocket& client,std::string request_filename,st
 				int bytesRecv = 0;
 
 				//start chunk transfer
-				client.send("OK");
+				client << "OK";
 
 				std::cout<<"Recieving chunks...\n";
 				while(bytesRecv < fileSize) {
 
 					//get chunk size, and reply
-					client.recv(data);
+					client >> data;
 					int chunkSize = atoi(data.c_str());
-					client.send("OK");
+					client <<"OK";
 		
 					//set vector to chunksize and recieve data
 					std::vector<char> chunk;
@@ -65,7 +65,8 @@ void requestFile(SocketLib::ClientSocket& client,std::string request_filename,st
 					//stream chunk into file
 					for(const auto& c: chunk)
 						fstream << c;
-				}	
+				}
+				std::cout <<"Recieved: " << bytesRecv << " bytes.\n";
 			}	
 		}
 	} else {
