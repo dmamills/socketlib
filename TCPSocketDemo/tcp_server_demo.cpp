@@ -4,28 +4,35 @@
 #include <vector>
 #include <fstream>
 
-int main() {
+
+void sendFile(SocketLib::ServerSocket& connection) {
 	
-	SocketLib::ServerSocket server(27015);
-
-	while(1) {
-		SocketLib::ServerSocket connection;
-		server.accept(connection);
-
 		std::string data;
 		while(1) {
-			std::ifstream fstream("in.jpg",std::ios::binary);
+			std::ifstream fstream("test.md", std::ios::in | std::ios::binary| std::ios::ate);
 
 			if(fstream.is_open()) {
 				
-				connection.recv(data);
+				//Start file transfer
+				 connection.recv(data);
+
 				 if(data == "READY") {
+					 std::cout <<"Got ready, sending size\n";
+					 std::string d;
+					 int fsize = fstream.tellg();
+					 connection.send(std::to_string(fsize));
+					 connection.recv(d);
 
-					 std::streambuf* buffer = fstream.rdbuf();
-					 std::ostringstream oss;
-					 oss << buffer;
+					 if(d == "OK") {
+						 std::cout <<"File Size recieved.\nSending Chunks...";
 
-					 connection.send(oss.str());
+						 fstream.seekg(0,fstream.beg);
+						 std::string s;
+						 while(std::getline(fstream,s)) {
+							int bytesSent = connection.send(s);
+							std::cout<<"chunk of size " << bytesSent << " sent...\n";
+						}
+					}
 				 }
 				 fstream.close();
 			} else {
@@ -33,8 +40,18 @@ int main() {
 			}
 			 break;
 		}
+}
+
+
+int main() {
+	
+	SocketLib::ServerSocket server(27015);
+
+	while(1) {
+		SocketLib::ServerSocket connection;
+		server.accept(connection);
+		sendFile(connection);
 		break;
 	}
-	
 	return 0;
 }

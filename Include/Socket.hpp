@@ -35,11 +35,10 @@ public:
 	bool accept(Socket&);
 	bool connect(std::string,int);
 
+
+
 	int send(std::string);
 	int recv(std::string&);
-
-	int send(std::streambuf*);
-	//int recv(std::streambuf&);
 
 	Socket& operator << (std::string);
 	Socket& operator >> (std::string&);

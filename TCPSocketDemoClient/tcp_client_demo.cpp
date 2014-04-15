@@ -6,7 +6,7 @@
 int main() {
 
 	SocketLib::ClientSocket client("127.0.0.1",27015);
-	std::ofstream fstream("out.jpg",std::ios::binary);
+	std::ofstream fstream("out.md",std::ios::binary);
 
 	if(fstream.is_open()) {
 		std::cout <<"File opened\n";
@@ -15,29 +15,31 @@ int main() {
 		while(getline(std::cin,i)) {
 		
 			client.send(i);
-			std::string data;
+			std::string s;
+			int r = client.recv(s);
+			std::cout <<"File size: " << s <<"\n";
+			int fileSize = atoi(s.c_str());
+			int bytesRecv = 0;
+			client.send("OK");
 
-			client.recv(data);
-			fstream << data;
-	
+			std::cout<<"Recieving chunks...\n";
+			while(bytesRecv < fileSize) {
+				std::string chunk;
+				int r = client.recv(chunk);
+				std::cout <<"Got chunk size: " << r << "\n";
+
+				if(r == 0) {
+					break;
+				}
+				bytesRecv += r;
+				fstream << chunk;
+
+			}
+			break;
 		}
 	} else {
 		std::cout <<"FILE NOT OPENED!\n";
 	}
 	fstream.close();
-	//std::string data;
-	//std::string in;
-
-	//while(getline(std::cin,in)) {
-	//	std::cout<<"Sending: " << in << "\n";
-	//	client.send(in);
-	//	client.recv(data);
-	//	std::cout << "Recieved: " << data << "\n";
-
-	//	data.clear();
-	//	in.clear();
-	//}
-	//
-
 	return 0;
 }

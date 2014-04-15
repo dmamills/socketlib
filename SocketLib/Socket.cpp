@@ -74,25 +74,41 @@ bool Socket::initSocket(int type) {
 
 int Socket::send(std::string data) { 
 	std::cout <<"sending: " << data <<"\n";
-	return ::send(_hSocket,data.c_str(),strlen(data.c_str()),0);
+
+
+	int r = ::send(_hSocket,data.c_str(),strlen(data.c_str()),0);
+	if(r == SOCKET_ERROR) {
+	  std::cout<<"WSA Error in send: " << WSAGetLastError() << "\n";
+	}
+
+	return r; 
 }
 
 int Socket::recv(std::string& data) {
 
 	char buf[MAX_SIZE+1];
 	int r = ::recv(_hSocket,buf,MAX_SIZE,0);
-	buf[min(r,255)] = 0;
-	data = buf;
 
+	if(r == SOCKET_ERROR) {
+		std::cout<<"WSA Error in recv: " << WSAGetLastError() << "\n";
+	} else {
+		buf[min(r,255)] = 0;
+		data = buf;
+	}
 	std::cout <<"Recieved: " << data << "\n";
+
 	return r;
 }
+
 
 void Socket::close() {
 	closesocket(_hSocket);
 	WSACleanup();
 }
 
+
+
+/* Operator overloads for that real stream feel! */
 Socket& Socket::operator << (std::string data) {
 	Socket::send(data);
 	return *this;
@@ -101,13 +117,4 @@ Socket& Socket::operator << (std::string data) {
 Socket& Socket::operator >> (std::string& data) {
 	Socket::recv(data);
 	return *this;
-}
-
-int Socket::send(std::streambuf* buffer) {
-	std::ostringstream oss;
-	oss << buffer;
-	//std::cout <<"Sending data: " << oss.str() << "\n";
-
-
-	return ::send(_hSocket,oss.str().c_str(),sizeof(oss.str().c_str()),0); 
 }
