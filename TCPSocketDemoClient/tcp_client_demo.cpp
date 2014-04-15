@@ -52,8 +52,13 @@ void requestFile(SocketLib::ClientSocket& client,std::string request_filename,st
 					//set vector to chunksize and recieve data
 					std::vector<char> chunk;
 					chunk.resize(chunkSize);
-					int r = client.recv(chunk);
-
+					int r = 0;
+					if( chunkSize > 0 ){
+						r = client.recv(chunk);
+					}
+					else{
+						break;
+					}
 					//increment byte counter
 					bytesRecv += r;
 
