@@ -36,15 +36,18 @@ public:
 	bool accept(Socket&);
 	bool connect(std::string,int);
 
+	//regular strings
 	int send(std::string);
 	int recv(std::string&);
-	int recv(std::string&,int);
 
+	//for binary files
 	int send(std::vector<char>);
 	int recv(std::vector<char>&);
 
 	Socket& operator << (std::string);
 	Socket& operator >> (std::string&);
+	Socket& operator << (std::vector<char>);
+	Socket& operator >> (std::vector<char>);
 
 private:
 

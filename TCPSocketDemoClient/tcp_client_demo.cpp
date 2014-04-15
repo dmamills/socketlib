@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-
 /*
    File transfer handshake
 
@@ -15,48 +14,53 @@
 */
 
 void requestFile(SocketLib::ClientSocket& client,std::string request_filename,std::string output_filename) {
+
 	std::ofstream fstream(output_filename,std::ios::binary);
 
 	if(fstream.is_open()) {
 		std::cout <<"File opened\n";
 		
-		std::string i;
+		//Start file request, and wait for reply
 		client.send("OK");
-		std::string s;
-		client.recv(s);
+		std::string data;
+		client.recv(data);
+		if(data == "OK") {
 
-		if(s == "OK") {
+			//send filename
 			std::cout << "Got OK, sending filename\n";
 			client.send(request_filename);
-			client.recv(s);
-				
-			if(s != "NOTFOUND") {
-				std::cout <<"File size: " << s <<"\n";
-				int fileSize = atoi(s.c_str());
+			client.recv(data);
+			
+			if(data != "NOTFOUND") {
+				//get total file size
+				std::cout <<"File size: " << data <<"\n";
+
+				int fileSize = atoi(data.c_str());
 				int bytesRecv = 0;
+
+				//start chunk transfer
 				client.send("OK");
 
 				std::cout<<"Recieving chunks...\n";
 				while(bytesRecv < fileSize) {
 
-					client.recv(s);
-					int chunkSize = atoi(s.c_str());
-					std::cout <<"Chunk will be: " << chunkSize << " bytes.\n";
+					//get chunk size, and reply
+					client.recv(data);
+					int chunkSize = atoi(data.c_str());
 					client.send("OK");
+		
+					//set vector to chunksize and recieve data
 					std::vector<char> chunk;
 					chunk.resize(chunkSize);
 					int r = client.recv(chunk);
-					std::cout <<"Got chunk size: " << r << "\n";
 
-					/*if(r == 0) {
-						std::cout<<"Connection closed, closing file.\n";
-						break;
-					}*/
+					//increment byte counter
 					bytesRecv += r;
+
+					//stream chunk into file
 					for(const auto& c: chunk)
-						fstream << c; //<<"\n";
-				}
-			
+						fstream << c;
+				}	
 			}	
 		}
 	} else {
@@ -69,14 +73,14 @@ void requestFile(SocketLib::ClientSocket& client,std::string request_filename,st
 int main() {
 
 	SocketLib::ClientSocket client("127.0.0.1",27015);
-	/*std::string rf;
+	std::string rf;
 	std::string of;
 
 	std::cout<<"request filename?";
 	std::cin>>rf;
 
 	std::cout<<"out filename?";
-	std::cin>>of;*/
-	requestFile(client,"in.jpg","out2.jpg");
+	std::cin>>of;
+	requestFile(client,rf,of);
 	return 0;
 }
