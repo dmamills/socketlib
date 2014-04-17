@@ -27,9 +27,16 @@ bool Socket::listen() {
 }
 
 bool Socket::accept(Socket& conn) {
+
   int addr_length = sizeof(_addr);
   conn._hSocket = ::accept( _hSocket, ( SOCKADDR* ) &_addr, ( socklen_t * ) &addr_length );
-  return (conn._hSocket > 0);
+
+  if(conn._hSocket == INVALID_SOCKET) {
+	  std::cout<<"Error in accept: "<< WSAGetLastError() << "\n";
+	  return false;
+  }
+
+  return true;
 }
 
 bool Socket::connect(std::string ip, int port) {

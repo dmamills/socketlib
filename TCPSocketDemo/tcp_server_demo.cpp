@@ -4,16 +4,20 @@
 #include <vector>
 #include <thread>
 #include <fstream>
+#include <mutex>
 
 
 /*
    File transfer handshake
 
-   CLIENT-> READY
-   SERVER->OK
-   CLIENT->FILENAME
+   CLIENT-> OK
+   SERVER-> OK
+   CLIENT-> FILENAME
    SERVER-> (FILESIZE/NOTFOUND)
-   SERVER->CHUNKS
+   CLIENT-> OK
+   LOOP
+     SERVER-> CHUNK SIZE
+	 SERVER-> CHUNK
 
 */
 
@@ -33,7 +37,7 @@ int sendChunk(SocketLib::ServerSocket& connection,std::vector<char> chunk) {
 	return bytesSent;
 }
 
-void sendFile(SocketLib::ServerSocket& connection) {
+void sendFile(SocketLib::ServerSocket connection) {
 	
 	std::cout <<"Started connection thread #" << std::this_thread::get_id() << "\n";
 	std::string data;
@@ -110,15 +114,31 @@ void sendFile(SocketLib::ServerSocket& connection) {
 	}
 }
 
+void threadfunc(SocketLib::ServerSocket* conn) {
+		sendFile(*conn);	
+}
+
 int main() {
 	
 	SocketLib::ServerSocket server(27015);
+	std::vector<std::thread> threads;
+	std::vector<SocketLib::ServerSocket*> connections;
 
-	while(1) {
-		SocketLib::ServerSocket connection;
-		server.accept(connection);
-     	sendFile(connection);
-		//break;
+
+	//how do i break this?!?
+	while(true) {
+		SocketLib::ServerSocket* connection = new SocketLib::ServerSocket();
+		if(server.accept(*connection)) {
+			threads.push_back(std::thread(threadfunc,connection));
+			connections.push_back(connection);
+		} else {
+			delete connection;
+		}
 	}
+	
+	//how do these get hit?
+	for(auto& t:threads)t.join();
+	for(auto& c:connections)delete c;
+
 	return 0;
 }

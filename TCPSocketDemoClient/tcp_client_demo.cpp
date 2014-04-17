@@ -2,16 +2,20 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+
 /*
    File transfer handshake
 
-   CLIENT-> READY
+   CLIENT-> OK
    SERVER-> OK
    CLIENT-> FILENAME
    SERVER-> (FILESIZE/NOTFOUND)
-   SERVER-> CHUNKS
-
+   CLIENT-> OK
+   LOOP
+     SERVER-> CHUNK SIZE
+	 SERVER-> CHUNK
 */
+
 
 void requestFile(SocketLib::ClientSocket& client,std::string request_filename,std::string output_filename) {
 
@@ -76,17 +80,16 @@ void requestFile(SocketLib::ClientSocket& client,std::string request_filename,st
 }
 
 
-int main() {
+int main(int argc, char* argv[]) {
 
 	SocketLib::ClientSocket client("127.0.0.1",27015);
-	std::string rf;
-	std::string of;
 
-	std::cout<<"request filename?";
-	std::cin>>rf;
+	if(argc<2) {
+		std::cout<<"usage: TCPSocketClientDemo.exe <request filename> <download name>\n";
+		return EXIT_FAILURE;
+	}
 
-	std::cout<<"out filename?";
-	std::cin>>of;
-	requestFile(client,rf,of);
+	std::cout<<"Requesting " << argv[1] << "from server, saving as " << argv[2] << "\n";
+	requestFile(client,argv[1],argv[2]);
 	return 0;
 }
