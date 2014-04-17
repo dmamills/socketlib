@@ -5,6 +5,7 @@
 #include <thread>
 #include <fstream>
 #include <mutex>
+#include <memory>
 
 
 /*
@@ -103,7 +104,6 @@ void sendFile(SocketLib::ServerSocket connection) {
 			}
 				std::cout<<"Closing file stream\n";
 				fstream.close();
-
 			} else {
 
 			std::cout<<"Requested file << " << data << " not found.\n";
@@ -122,23 +122,24 @@ int main() {
 	
 	SocketLib::ServerSocket server(27015);
 	std::vector<std::thread> threads;
-	std::vector<SocketLib::ServerSocket*> connections;
+	std::vector<std::shared_ptr<SocketLib::ServerSocket>> connections;
 
 
 	//how do i break this?!?
 	while(true) {
-		SocketLib::ServerSocket* connection = new SocketLib::ServerSocket();
-		if(server.accept(*connection)) {
-			threads.push_back(std::thread(threadfunc,connection));
+		std::shared_ptr<SocketLib::ServerSocket> connection (new SocketLib::ServerSocket());
+		//SocketLib::ServerSocket* connection = new SocketLib::ServerSocket();
+		if(server.accept( *connection )) {
+			threads.push_back(std::thread(threadfunc,connection.get()));
 			connections.push_back(connection);
-		} else {
+		} /*else {
 			delete connection;
-		}
+		}*/
 	}
 	
 	//how do these get hit?
 	for(auto& t:threads)t.join();
-	for(auto& c:connections)delete c;
+	//for(auto& c:connections)delete c;
 
 	return 0;
 }
