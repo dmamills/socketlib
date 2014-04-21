@@ -102,7 +102,6 @@ void sendFile(SocketLib::ServerSocket connection) {
 			}
 				std::cout<<"Closing file stream\n";
 				fstream.close();
-
 			} else {
 
 			std::cout<<"Requested file << " << data << " not found.\n";
@@ -128,14 +127,14 @@ int main() {
 	std::cout << "Server initialized, will send " << MAX_FILES_SENT << " files before shutting down.\n";
 	std::cout <<"Waiting for connections...\n";
 
+
 	while(c < MAX_FILES_SENT) {
 		SocketLib::ServerSocket* connection = new SocketLib::ServerSocket();
 		if(server.accept(*connection)) {
 			c++;
 			std::cout << "Connection established, " << c << " files \n";
 			threads.push_back(std::thread(threadfunc,connection));
-			connections.push_back(connection);
-			
+			connections.push_back(connection);		
 		} else {
 			delete connection;
 		}
@@ -144,6 +143,7 @@ int main() {
 	std::cout<<"Maximum files transferred, server shutdown, and cleaning up.\n";
 	
 	for(auto& t:threads)t.join();
+
 	while(!connections.empty()) {
 		delete connections.back();
 		connections.pop_back();
