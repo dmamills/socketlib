@@ -4,7 +4,6 @@
 #include <vector>
 #include <thread>
 #include <fstream>
-#include <mutex>
 
 
 /*
@@ -119,26 +118,36 @@ void threadfunc(SocketLib::ServerSocket* conn) {
 }
 
 int main() {
-	
+
 	SocketLib::ServerSocket server(27015);
 	std::vector<std::thread> threads;
 	std::vector<SocketLib::ServerSocket*> connections;
+	const int MAX_FILES_SENT = 5;
+	int c= 0;
 
+	std::cout << "Server initialized, will send " << MAX_FILES_SENT << " files before shutting down.\n";
+	std::cout <<"Waiting for connections...\n";
 
-	//how do i break this?!?
-	while(true) {
+	while(c < MAX_FILES_SENT) {
 		SocketLib::ServerSocket* connection = new SocketLib::ServerSocket();
 		if(server.accept(*connection)) {
+			c++;
+			std::cout << "Connection established, " << c << " files \n";
 			threads.push_back(std::thread(threadfunc,connection));
 			connections.push_back(connection);
+			
 		} else {
 			delete connection;
 		}
 	}
+
+	std::cout<<"Maximum files transferred, server shutdown, and cleaning up.\n";
 	
-	//how do these get hit?
 	for(auto& t:threads)t.join();
-	for(auto& c:connections)delete c;
+	while(!connections.empty()) {
+		delete connections.back();
+		connections.pop_back();
+	}
 
 	return 0;
 }

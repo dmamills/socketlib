@@ -2,7 +2,6 @@
 
 
 SocketLib::ServerSocket::ServerSocket() : Socket() {}
-
 SocketLib::ServerSocket::ServerSocket(int port)  {
 
 	if(!bind(port)) {

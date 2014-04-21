@@ -16,7 +16,6 @@
 #include <WS2tcpip.h>
 #pragma comment (lib,"ws2_32.lib")
 #include <string>
-#include <sstream>
 #include <vector>
 
 namespace SocketLib {

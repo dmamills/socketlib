@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	std::cout<<"Requesting " << argv[1] << "from server, saving as " << argv[2] << "\n";
+	std::cout<<"Requesting " << argv[1] << " from server, saving as " << argv[2] << "\n";
 	requestFile(client,argv[1],argv[2]);
 	return 0;
 }
