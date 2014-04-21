@@ -6,8 +6,7 @@
 *.suo
 *.user
 *.sln.docstates
-TCPSocketDemoClient/*.md
-TCPSocketDemoClient/*.jpg
+
 
 # Build results
 [Dd]ebug/
